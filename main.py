@@ -8,8 +8,6 @@ import datetime
 
 ADMIN_LOGIN = True
 current_admin = None
-
-
 class ClockInSystem(App):
     def __init__(self, *args):
         super(ClockInSystem, self).__init__(*args)
@@ -17,11 +15,12 @@ class ClockInSystem(App):
 
     def main(self):
         self.title = "智能视频打卡系统"
-
         # 主容器
-        container = gui.VBox(width=300, height='100%')
-        container.style['align-items'] = 'center'
-        self.main_container = container
+        container = gui.VBox(width="30%", height='100%')
+        container.style.update({'padding': '10px'})
+
+        result_container = gui.VBox(width='70%', height='100%')
+        result_container.style.update({'padding': '10px'})
 
         # 标题
         title = gui.Label("智能视频打卡系统", width='100%', height=15)
@@ -41,7 +40,7 @@ class ClockInSystem(App):
         self.update_login_status()
 
         # 按钮容器
-        self.btn_container = gui.VBox(width='80%', height='auto')
+        self.btn_container = gui.VBox(width='50%', height='auto')
         self.btn_container.style['align-items'] = 'center'
         self.btn_container.style['margin'] = '10px 0'
         container.append(self.btn_container)
@@ -50,18 +49,22 @@ class ClockInSystem(App):
         self.update_buttons()
 
         # 结果显示区域
-        self.result_label = gui.Label("", width='80%', height=100)
+        self.result_label = gui.Label("", width='80%', height='80%')
         self.result_label.style['margin'] = '10px'
         self.result_label.style['padding'] = '5px'
         self.result_label.style['border'] = '1px solid #ccc'
         self.result_label.style['overflow'] = 'auto'
         self.result_label.style['white-space'] = 'pre-line'
-        container.append(self.result_label)
+        result_container.append(self.result_label)
 
         # 存储当前对话框
         self.current_dialog = None
-
-        return container
+        # 创建水平布局容器
+        root = gui.HBox(width='100%', height='100%')
+        root.append(container)
+        root.append(result_container)
+        # 返回根容器
+        return root
 
     def update_login_status(self):
         """更新登录状态标签"""
@@ -83,28 +86,28 @@ class ClockInSystem(App):
         self.btn_clock.onclick.do(self.on_clock_in)
         self.btn_container.append(self.btn_clock)
 
-        self.btn_records = gui.Button("查看记录", width='100%', height=30)
-        self.btn_records.style['margin'] = '5px 0'
-        self.btn_records.onclick.do(self.on_check_records)
-        self.btn_container.append(self.btn_records)
-
-        self.btn_employee = gui.Button("员工管理", width='100%', height=30)
-        self.btn_employee.style['margin'] = '5px 0'
-        self.btn_employee.onclick.do(self.on_employee_management)
-        self.btn_container.append(self.btn_employee)
-
-        self.btn_report = gui.Button("考勤报表", width='100%', height=30)
-        self.btn_report.style['margin'] = '5px 0'
-        self.btn_report.onclick.do(self.on_check_report)
-        self.btn_container.append(self.btn_report)
-
-        self.btn_add_admin = gui.Button("添加管理员", width='100%', height=30)
-        self.btn_add_admin.style['margin'] = '5px 0'
-        self.btn_add_admin.onclick.do(self.on_add_admin)
-        self.btn_container.append(self.btn_add_admin)
-
         # 登录/退出按钮
         if ADMIN_LOGIN:
+            self.btn_records = gui.Button("查看记录", width='100%', height=30)
+            self.btn_records.style['margin'] = '5px 0'
+            self.btn_records.onclick.do(self.on_check_records)
+            self.btn_container.append(self.btn_records)
+
+            self.btn_employee = gui.Button("员工管理", width='100%', height=30)
+            self.btn_employee.style['margin'] = '5px 0'
+            self.btn_employee.onclick.do(self.on_employee_management)
+            self.btn_container.append(self.btn_employee)
+
+            self.btn_report = gui.Button("考勤报表", width='100%', height=30)
+            self.btn_report.style['margin'] = '5px 0'
+            self.btn_report.onclick.do(self.on_check_report)
+            self.btn_container.append(self.btn_report)
+
+            self.btn_add_admin = gui.Button("添加管理员", width='100%', height=30)
+            self.btn_add_admin.style['margin'] = '5px 0'
+            self.btn_add_admin.onclick.do(self.on_add_admin)
+            self.btn_container.append(self.btn_add_admin)
+
             self.btn_login = gui.Button("退出登录", width='100%', height=30)
             self.btn_login.style['margin'] = '5px 0'
             self.btn_login.style['background-color'] = 'red'
@@ -135,9 +138,6 @@ class ClockInSystem(App):
         :return:
         """
         global ADMIN_LOGIN
-        if ADMIN_LOGIN:
-            self.show_message("您已经以管理员身份登录")
-            return
 
         self.dialog = gui.GenericDialog(title='管理员登录', message='请输入管理员账号和密码',width=300, height=180)
 
@@ -238,51 +238,42 @@ class ClockInSystem(App):
         :param widget:
         :return:
         """
-        dialog = gui.VBox(width=400, height=300)
-        dialog.style.update({
-            'background-color': '#f0f0f0',
-            'border': '1px solid #333',
-            'border-radius': '5px',
-            'padding': '20px',
-            'box-shadow': '0 4px 8px rgba(0,0,0,0.2)',
-        })
-
-        # 添加标题
-        title = gui.Label('自定义窗口', width='100%', height='15%')
-        title.style.update({'font-size': '18px', 'text-align': 'center'})
-        dialog.append(title)
-
-        # 添加自定义按钮
-        btn1 = gui.Button('按钮1', width='80%', height=30)
-        btn1.style['margin'] = '10px auto'
-        btn1.onclick.do(lambda w: self.show_message("你点击了按钮1"))
-        dialog.append(btn1)
-
-        close_btn = gui.Button('关闭窗口', width='80%', height=30)
-        close_btn.style['margin'] = '20px auto'
-        close_btn.style['background-color'] = '#ff6666'
-        close_btn.onclick.do(lambda w: dialog.set_style({'display': 'none'}))
-        dialog.append(close_btn)
-        self.show_message(hr.get_record_all())
-        # 添加到主容器
-        self.main_container.append(dialog)
-        dialog.show(self)
-
-
-
-
-    def close_current_dialog(self):
-            """
-            关闭当前对话框
-            :return:
-            """
-            if hasattr(self, 'current_dialog') and self.current_dialog:
-                self.remove_child(self.current_dialog)  # 使用 remove_child 明确移除
-                self.current_dialog = None
+        self.dialog = gui.GenericDialog(title='查看记录', message='请选择所要使用的功能 ',width=300, height=180)
+        # 创建表单
+        form = gui.VBox(width='100%', height='100%')
+        # 按钮容器
+        buttons_container = gui.HBox(width='100%', height='30%')
+        buttons_container.style['justify-content'] = 'center'
+        buttons_container.style['align-items'] = 'center'
+        # 查看员工按钮
+        confirm_btn = gui.Button('查看员工', width=80, height=30)
+        confirm_btn.onclick.do(self.on_btn_employee_clicked)
+        # 查看打卡记录按钮
+        cancel_btn = gui.Button('查看打卡记录', width=80, height=30)
+        cancel_btn.onclick.do(self.on_btn_record_clicked)
+        #添加按钮信息
+        buttons_container.append(confirm_btn)
+        buttons_container.append(cancel_btn)
+        # 组装表单
+        form.append(buttons_container)
+        # 将表单添加到对话框
+        self.dialog.add_field_with_label('form', '查看记录', form)
+        # 显示对话框
+        self.dialog.show(self)
+    def on_btn_employee_clicked(self, widget):
+        """点击'查看员工'按钮"""
+        # report = hr.get_employee_report()
+        self.show_message(hr.get_employee_report())
+        self.dialog.hide()
+    def on_btn_record_clicked(self, widget):
+        """点击'查看打卡记录'按钮"""
+        report = hr.get_record_all()
+        self.show_message(report)
+        self.dialog.hide()
 
     def on_employee_management(self, widget):
         """
-
+        员工管理
         :param widget:
         :return:
         """
@@ -751,54 +742,69 @@ class ClockInSystem(App):
         self.append(dialog)
 
     def on_add_admin(self, widget):
-        self.close_current_dialog()
+        self.dialog = gui.GenericDialog(title='管理员添加', message='请输入添加管理员账号和密码', width=300, height=180)
 
-        # 创建添加管理员对话框
-        dialog = gui.VBox(width=280, height='auto')
-        dialog.style['padding'] = '15px'
-        dialog.style['border'] = '1px solid #ccc'
-        dialog.style['background-color'] = '#f9f9f9'
-        dialog.style['border-radius'] = '5px'
+        # 创建表单
+        form = gui.VBox(width='100%', height='100%')
 
-        title = gui.Label("添加管理员", width='100%', height=20)
-        title.style['font-weight'] = 'bold'
-        title.style['margin-bottom'] = '15px'
-        title.style['text-align'] = 'center'
-
-        username_container = gui.VBox(width='100%', height='auto')
-        username_label = gui.Label("用户名:", width='100%', height=20)
-        username_input = gui.TextInput(width='100%', height=30)
+        # 用户名输入
+        username_container = gui.HBox(width='100%', height='30%')
+        username_label = gui.Label('用户名:', width='30%', height='100%')
+        self.username_input = gui.Input(width='70%', height='80%')
         username_container.append(username_label)
-        username_container.append(username_input)
+        username_container.append(self.username_input)
 
-        buttons_container = gui.HBox(width='100%', height=40)
-        buttons_container.style['justify-content'] = 'space-between'
-        buttons_container.style['margin-top'] = '15px'
+        # 密码输入
+        password_container = gui.HBox(width='100%', height='30%')
+        password_label = gui.Label('密码:', width='30%', height='100%')
+        self.password_input = gui.Input(width='70%', height='80%', input_type='password')
+        password_container.append(password_label)
+        password_container.append(self.password_input)
 
-        btn_confirm = gui.Button("确定", width='48%', height=30)
-        btn_cancel = gui.Button("取消", width='48%', height=30)
-        buttons_container.append(btn_confirm)
-        buttons_container.append(btn_cancel)
+        # 按钮容器
+        buttons_container = gui.HBox(width='100%', height='30%')
+        buttons_container.style['justify-content'] = 'center'
+        buttons_container.style['align-items'] = 'center'
 
-        dialog.append(title)
-        dialog.append(username_container)
-        dialog.append(buttons_container)
+        # 确认按钮
+        confirm_btn = gui.Button('添加', width=80, height=30)
+        confirm_btn.onclick.do(self.on_confirm)
+        # 取消按钮
+        cancel_btn = gui.Button('取消', width=80, height=30)
+        cancel_btn.onclick.do(self.dialog.hide)
 
-        def on_confirm(widget):
-            username = username_input.get_value().strip()
-            if username:
-                hr.add_user(username)
-                self.show_message(f"管理员 {username} 添加成功!")
-                self.close_current_dialog()
+        buttons_container.append(confirm_btn)
+        buttons_container.append(cancel_btn)
 
-        def on_cancel(widget):
+        # 组装表单
+        form.append(username_container)
+        form.append(password_container)
+        form.append(buttons_container)
+
+        # 将表单添加到对话框
+        self.dialog.add_field_with_label('form', '添加表单', form)
+
+        # 显示对话框
+        self.dialog.show(self)
+
+    def on_confirm(self,widget):
+        username = self.username_input.get_value()
+        password = self.password_input.get_value()
+        if hr.add_user(username,password):
+            self.show_message(f"管理员 {username} 添加成功!")
+            self.dialog.hide()
+            self.close_current_dialog()
+        else:
+            self.show_message("管理员添加失败")
+            self.dialog.hide()
             self.close_current_dialog()
 
-        btn_confirm.onclick.do(on_confirm)
-        btn_cancel.onclick.do(on_cancel)
-
-        self.current_dialog = dialog
-        self.append(dialog)
+    # def on_cancel(self,widget):
+    #     self.close_current_dialog()
+    #     btn_confirm.onclick.do(on_confirm)
+    #     btn_cancel.onclick.do(on_cancel)
+    #     self.current_dialog = dialog
+    #     self.append(dialog)
 
     def on_exit(self, widget):
         self.close()
