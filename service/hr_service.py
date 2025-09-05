@@ -66,8 +66,6 @@ def add_lock_record(name):
             o.LOCK_RECORD[name] = r_list  # 存入全局字典
         print(name + "打卡成功！")
         io.save_lock_record()  # 保存所有打卡记录
-
-
 #所有员工信息报表
 def get_employee_report():
     '''
@@ -76,15 +74,22 @@ def get_employee_report():
     report = "###############################\n"
     report += "员工名单如下：\n"
     i = 0 #换行计数器
+    n = 0
     for emp in o.EMPLOYEES: #遍历所有员工
+        file_path = 'data/employee_data.txt'  # 替换成你的文本文件路径
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        num_lines = len(lines)
         report += "("+ str(emp.id)+")"+ emp.name + "\t"
         i += 1
+        n += 1
         if i ==4: #四个换一行
             report +="\n"
             i = 0
-    report = report.strip() #清除可能的多余换行符
-    report += "\n##############################"
-    return report
+        if n == num_lines:
+            report += "\n##############################"
+            return report
+
 #检查id是否存在
 def check_id(id):
     '''
@@ -350,15 +355,14 @@ def save_users(users):
         for username, password in users.items():
             f.write(f"{username}:{password}\n")
 
-def add_user(username):
+def add_user(username,password):
     '''
     添加管理员
     :param username: 管理员名称
     :return:
     '''
     if username in o.USERS:#判断不存在同名管理
-        print(f"用户 '{username}' 已存在！")
-        return
-    password = input("请输入管理员密码:")
+        return False
     o.USERS[username] = password #添加管理员
     save_users(o.USERS)#保存
+    return True
